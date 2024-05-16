@@ -8,8 +8,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
+            background-color: #1e1e1e;
+            color: #dcdcdc;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -19,7 +19,7 @@
         }
 
         h1 {
-            color: #2c3e50;
+            color: #f39c12;
         }
 
         p {
@@ -36,14 +36,16 @@
 
         input {
             padding: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #555;
             border-radius: 4px;
+            background-color: #333;
+            color: #dcdcdc;
         }
 
         button {
             padding: 10px 20px;
-            background-color: #2980b9;
-            color: #fff;
+            background-color: #f39c12;
+            color: #1e1e1e;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -51,15 +53,15 @@
         }
 
         button:hover {
-            background-color: #3498db;
+            background-color: #e67e22;
         }
 
         #result {
             margin-top: 20px;
-            background-color: #fff;
+            background-color: #2c3e50;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             width: 80%;
             max-width: 600px;
         }
@@ -75,7 +77,7 @@
         }
 
         #result li {
-            background-color: #ecf0f1;
+            background-color: #34495e;
             margin: 5px 0;
             padding: 10px;
             border-radius: 4px;
@@ -84,9 +86,10 @@
 
         .monospace {
             font-family: "Courier New", Courier, monospace;
-            background-color: #ecf0f1;
+            background-color: #34495e;
             padding: 2px 4px;
             border-radius: 4px;
+            color: #e74c3c;
         }
     </style>
 </head>
@@ -186,9 +189,8 @@
 
                 const { ops, path, steps } = minOperationsAndPath(target, maxNumber);
                 resultDiv.innerHTML = `
-                    <p>Minimum operations needed to reach <span class="monospace">${target}</span> using numbers from <span class="monospace">${maxNumber}</span>: <span class="monospace">${ops}</span></p>
+                    <p>Minimum ops needed to reach <span class="monospace">${target}</span> using numbers from <span class="monospace">${maxNumber}</span>: <span class="monospace">${ops}</span></p>
                     <p>Path to reach <span class="monospace">${target}</span>: <span class="monospace">${path}</span></p>
-                    <p>Detailed Steps:</p>
                     <ul>${steps.slice(1).map(step => `<li>${step}</li>`).join('')}</ul>
                 `;
             });
