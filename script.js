@@ -91,8 +91,8 @@ function optimize() {
     const target = parseInt(document.getElementById('target').value);
     const [minOps, path, steps] = minOperationsAndPath(target, maxNumber);
 
-    document.getElementById('result').innerText = `Minimum operations needed to reach ${target} using numbers from 1 to ${maxNumber}: ${minOps}`;
-    document.getElementById('path').innerText = `Path to reach ${target}: ${path}`;
+    document.getElementById('path').innerText = `Path to ${target}: ${path}`;
+    document.getElementById('result').innerText = `Minimum operations needed to reach ${target} using 1-${maxNumber} is ${minOps}`;
     document.getElementById('steps').innerText = steps.join('\n');
 }
 

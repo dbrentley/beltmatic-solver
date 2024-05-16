@@ -9,12 +9,16 @@
 <body>
     <div class="container">
         <h1>Beltmatic Solver</h1>
+        <p class="sub">Get Beltmatic on <a target="_new"
+                href="https://store.steampowered.com/app/2674590/Beltmatic/">Steam</a></p>
         <div class="input-group">
-            <label for="maxNumber">Max Number:</label>
+            <label for="maxNumber">Max Number</label>
+            <p class="description">The highest number you have unlocked.</p>
             <input type="number" id="maxNumber" name="maxNumber">
         </div>
         <div class="input-group">
-            <label for="target">Target:</label>
+            <label for="target">Target</label>
+            <p class="description">The number you are trying to create.</p>
             <input type="number" id="target" name="target">
         </div>
         <button onclick="optimize()">Solve</button>
