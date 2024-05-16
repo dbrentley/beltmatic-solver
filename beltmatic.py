@@ -1,127 +1,116 @@
 from collections import deque
 
-"""
-Beltmatic Optimizer
-Author: Brent Douglas (https://github.com/dbrentley)
-
-Edit the two variables "max_number" and "target". max_number is the 
-highest number you have unlocked and target is the target you are trying 
-to reach.
-"""
 # User inputs
-# Maximum (highest) number you have unlocked
-max_number = 13
+max_number = 2
+target = 233223
 
-# Target number you want to find
-target = 3660
+
+def combine_steps(steps):
+    # Combine consecutive additions or subtractions
+    combined_steps = []
+    i = 0
+    while i < len(steps):
+        if "Add" in steps[i] or "Subtract" in steps[i]:
+            current_op = "Add" if "Add" in steps[i] else "Subtract"
+            current_val = int(steps[i].split()[-1])
+            combined_step = steps[i]
+            i += 1
+            while i < len(steps) and current_op in steps[i]:
+                current_val += int(steps[i].split()[-1])
+                combined_step = f"{current_op} {current_val} to get {current_val}"
+                i += 1
+            combined_steps.append(combined_step)
+        else:
+            combined_steps.append(steps[i])
+            i += 1
+    return combined_steps
 
 
 def min_operations_and_path(target, max_number):
-    # Generate numbers from 1 to max_number
     numbers = list(range(1, max_number + 1))
-
-    # Dictionary to store the minimum operations and path to reach each number
     operations = {num: (0, str(num), [f"Start with {num}"]) for num in numbers}
-
-    # Queue for processing numbers, starting with all numbers from 1 to max_number
     queue = deque(numbers)
+    visited = set(numbers)
 
     while queue:
         current = queue.popleft()
-
-        # Current number of operations, path, and detailed steps to reach `current`
         current_operations, current_path, current_steps = operations[current]
 
         for num in numbers:
-            # Addition
-            new_number = current + num
-            if new_number <= target and new_number not in operations:
-                new_path = f"{current_path}+{num}"
-                new_steps = current_steps + [
-                    f"Add {num} to {current} to get {new_number}"
-                ]
-                operations[new_number] = (current_operations + 1, new_path, new_steps)
-                queue.append(new_number)
+            # List of potential operations
+            potential_operations = [
+                (
+                    current + num,
+                    f"{current_path}+{num}",
+                    f"Add {num} to {current} to get {current + num}",
+                ),
+                (
+                    current - num,
+                    f"{current_path}-{num}",
+                    f"Subtract {num} from {current} to get {current - num}",
+                ),
+                (
+                    current * num,
+                    f"({current_path})*{num}",
+                    f"Multiply {current} by {num} to get {current * num}",
+                ),
+            ]
 
-            # Subtraction
-            new_number = current - num
-            if new_number >= 1 and new_number not in operations:
-                new_path = f"{current_path}-{num}"
-                new_steps = current_steps + [
-                    f"Subtract {num} from {current} to get {new_number}"
-                ]
-                operations[new_number] = (current_operations + 1, new_path, new_steps)
-                queue.append(new_number)
-
-            # Multiplication
-            new_number = current * num
-            if new_number <= target and new_number not in operations:
-                new_path = f"({current_path})*{num}"
-                new_steps = current_steps + [
-                    f"Multiply {current} by {num} to get {new_number}"
-                ]
-                operations[new_number] = (current_operations + 1, new_path, new_steps)
-                queue.append(new_number)
-
-            # Division
+            # Include division only if it is valid
             if num != 0 and current % num == 0:
-                new_number = current // num
-                if new_number >= 1 and new_number not in operations:
-                    new_path = f"({current_path})/{num}"
-                    new_steps = current_steps + [
-                        f"Divide {current} by {num} to get {new_number}"
-                    ]
+                potential_operations.append(
+                    (
+                        current // num,
+                        f"({current_path})/{num}",
+                        f"Divide {current} by {num} to get {current // num}",
+                    )
+                )
+
+            # Include exponentiation only if it does not overflow
+            if current != 1 and num != 1:
+                try:
+                    exp_result = current**num
+                    if exp_result <= target:
+                        potential_operations.append(
+                            (
+                                exp_result,
+                                f"({current_path})^{num}",
+                                f"Raise {current} to the power of {num} to get {exp_result}",
+                            )
+                        )
+                except OverflowError:
+                    pass
+
+            # Include remainder only if it is valid
+            if num != 0:
+                remainder = current % num
+                potential_operations.append(
+                    (
+                        remainder,
+                        f"({current_path})%{num}",
+                        f"Take remainder of {current} divided by {num} to get {remainder}",
+                    )
+                )
+
+            for new_number, new_path, new_step in potential_operations:
+                if new_number <= target and new_number not in visited:
+                    new_steps = current_steps + [new_step]
                     operations[new_number] = (
                         current_operations + 1,
                         new_path,
-                        new_steps,
+                        combine_steps(new_steps),
                     )
                     queue.append(new_number)
+                    visited.add(new_number)
 
-            # Exponentiation
-            if current != 1 and num != 1:  # Avoid infinite loop with 1^num
-                try:
-                    new_number = current**num
-                    if new_number <= target and new_number not in operations:
-                        new_path = f"({current_path})^{num}"
-                        new_steps = current_steps + [
-                            f"Raise {current} to the power of {num} to get {new_number}"
-                        ]
-                        operations[new_number] = (
+                    if new_number == target:
+                        return (
                             current_operations + 1,
                             new_path,
-                            new_steps,
+                            combine_steps(new_steps),
                         )
-                        queue.append(new_number)
-                except OverflowError:
-                    continue  # Skip cases where the exponentiation results in an overflow
 
-            # Handle remainder as a new value
-            if num != 0:
-                remainder = current % num
-                if remainder >= 1 and remainder not in operations:
-                    new_path = f"({current_path})%{num}"
-                    new_steps = current_steps + [
-                        f"Take remainder of {current} divided by {num} to get {remainder}"
-                    ]
-                    operations[remainder] = (
-                        current_operations + 1,
-                        new_path,
-                        new_steps,
-                    )
-                    queue.append(remainder)
-
-        # Early exit if target is reached
-        if target in operations:
-            min_ops, path, steps = operations[target]
-            return min_ops, path, steps
-
-    # If no solution found, return -1 or an indication of impossibility
-    if target in operations:
-        min_ops, path, steps = operations[target]
-        return min_ops, path, steps
-    else:
-        return -1, "No solution", []
+    return -1, "No solution", []
 
 
 min_ops, path, steps = min_operations_and_path(target, max_number)
