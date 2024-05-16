@@ -7,9 +7,9 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 640px;
     margin: 50px auto;
-    padding: 20px;
+    padding: 40px;
     background: #1e1e1e;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -40,6 +40,10 @@ label {
 
 .sub {
     text-align: center;
+}
+
+.spacer {
+    margin-bottom: 15px;
 }
 
 input[type="number"] {
