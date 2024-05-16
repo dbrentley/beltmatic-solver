@@ -5,6 +5,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beltmatic Optimizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        label,
+        input,
+        button {
+            font-size: 1em;
+            margin: 10px 0;
+        }
+
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3498db;
+        }
+
+        #result {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+        }
+
+        #result p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        #result ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #result li {
+            background-color: #ecf0f1;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        .monospace {
+            font-family: "Courier New", Courier, monospace;
+            background-color: #ecf0f1;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 
 <body>
@@ -17,7 +101,99 @@
     <button id="calculate">Calculate</button>
     <div id="result"></div>
 
-    <script src="beltmatic.js"></script>
+    <script>
+        function minOperationsAndPath(target, maxNumber) {
+            const numbers = Array.from({ length: maxNumber }, (_, i) => i + 1);
+            const operations = { 0: { ops: 0, path: "", steps: [] } };
+            const queue = [0];
+
+            while (queue.length > 0) {
+                const current = queue.shift();
+                const { ops: currentOperations, path: currentPath, steps: currentSteps } = operations[current];
+
+                for (const num of numbers) {
+                    let newNumber = current + num;
+                    if (newNumber <= target && !(newNumber in operations)) {
+                        const newPath = currentPath ? `${currentPath}+${num}` : `${num}`;
+                        const newSteps = [...currentSteps, `Add ${num} to ${current} to get ${newNumber}`];
+                        operations[newNumber] = { ops: currentOperations + 1, path: newPath, steps: newSteps };
+                        queue.push(newNumber);
+                    }
+
+                    newNumber = current - num;
+                    if (newNumber >= 0 && !(newNumber in operations)) {
+                        const newPath = currentPath ? `${currentPath}-${num}` : `-${num}`;
+                        const newSteps = [...currentSteps, `Subtract ${num} from ${current} to get ${newNumber}`];
+                        operations[newNumber] = { ops: currentOperations + 1, path: newPath, steps: newSteps };
+                        queue.push(newNumber);
+                    }
+
+                    newNumber = current * num;
+                    if (newNumber <= target && !(newNumber in operations)) {
+                        const newPath = currentPath ? `(${currentPath})*${num}` : `${num}`;
+                        const newSteps = [...currentSteps, `Multiply ${current} by ${num} to get ${newNumber}`];
+                        operations[newNumber] = { ops: currentOperations + 1, path: newPath, steps: newSteps };
+                        queue.push(newNumber);
+                    }
+
+                    if (num !== 0 && current % num === 0) {
+                        newNumber = current / num;
+                        if (!(newNumber in operations)) {
+                            const newPath = currentPath ? `(${currentPath})/${num}` : `1/${num}`;
+                            const newSteps = [...currentSteps, `Divide ${current} by ${num} to get ${newNumber}`];
+                            operations[newNumber] = { ops: currentOperations + 1, path: newPath, steps: newSteps };
+                            queue.push(newNumber);
+                        }
+                    }
+
+                    if (current !== 0 && num !== 1) {
+                        try {
+                            newNumber = Math.pow(current, num);
+                            if (newNumber <= target && !(newNumber in operations)) {
+                                const newPath = currentPath ? `(${currentPath})^${num}` : `${current}^${num}`;
+                                const newSteps = [...currentSteps, `Raise ${current} to the power of ${num} to get ${newNumber}`];
+                                operations[newNumber] = { ops: currentOperations + 1, path: newPath, steps: newSteps };
+                                queue.push(newNumber);
+                            }
+                        } catch (e) {
+                            continue;
+                        }
+                    }
+                }
+
+                if (target in operations) {
+                    const { ops, path, steps } = operations[target];
+                    return { ops, path, steps };
+                }
+            }
+
+            if (target in operations) {
+                const { ops, path, steps } = operations[target];
+                return { ops, path, steps };
+            } else {
+                return { ops: -1, path: "No solution", steps: [] };
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const maxNumberInput = document.getElementById("max-number");
+            const targetInput = document.getElementById("target");
+            const resultDiv = document.getElementById("result");
+
+            document.getElementById("calculate").addEventListener("click", () => {
+                const maxNumber = parseInt(maxNumberInput.value);
+                const target = parseInt(targetInput.value);
+
+                const { ops, path, steps } = minOperationsAndPath(target, maxNumber);
+                resultDiv.innerHTML = `
+                    <p>Minimum operations needed to reach <span class="monospace">${target}</span> using numbers from <span class="monospace">${maxNumber}</span>: <span class="monospace">${ops}</span></p>
+                    <p>Path to reach <span class="monospace">${target}</span>: <span class="monospace">${path}</span></p>
+                    <p>Detailed Steps:</p>
+                    <ul>${steps.slice(1).map(step => `<li>${step}</li>`).join('')}</ul>
+                `;
+            });
+        });
+    </script>
 </body>
 
 </html>
