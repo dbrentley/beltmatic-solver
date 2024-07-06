@@ -1,4 +1,4 @@
-function minOperationsAndPath(target, maxNumber) {
+function minOperationsAndPath(target, maxNumber, options) {
     const numbers = Array.from({ length: maxNumber }, (_, i) => i + 1);
     const operations = {};
     numbers.forEach(num => {
@@ -23,7 +23,7 @@ function minOperationsAndPath(target, maxNumber) {
 
             // Subtraction
             newNumber = current - num;
-            if (newNumber >= 1 && !operations[newNumber]) {
+            if (newNumber >= 1 && !operations[newNumber] && options.subAvailable) {
                 const newPath = `${currentPath}-${num}`;
                 const newSteps = [...currentSteps, `Subtract ${num} from ${current} to get ${newNumber}`];
                 operations[newNumber] = [currentOperations + 1, newPath, newSteps];
@@ -32,7 +32,7 @@ function minOperationsAndPath(target, maxNumber) {
 
             // Multiplication
             newNumber = current * num;
-            if (newNumber <= target && !operations[newNumber]) {
+            if (newNumber <= target && !operations[newNumber] && options.mulAvailable) {
                 const newPath = `(${currentPath})*${num}`;
                 const newSteps = [...currentSteps, `Multiply ${current} by ${num} to get ${newNumber}`];
                 operations[newNumber] = [currentOperations + 1, newPath, newSteps];
@@ -40,7 +40,7 @@ function minOperationsAndPath(target, maxNumber) {
             }
 
             // Division
-            if (num !== 0 && current % num === 0) {
+            if (num !== 0 && current % num === 0 && options.divAvailable) {
                 newNumber = Math.floor(current / num);
                 if (newNumber >= 1 && !operations[newNumber]) {
                     const newPath = `(${currentPath})/${num}`;
@@ -51,7 +51,7 @@ function minOperationsAndPath(target, maxNumber) {
             }
 
             // Exponentiation
-            if (current !== 1 && num !== 1) {
+            if (current !== 1 && num !== 1 && options.expAvailable) {
                 try {
                     newNumber = Math.pow(current, num);
                     if (newNumber <= target && !operations[newNumber]) {
@@ -89,7 +89,13 @@ function minOperationsAndPath(target, maxNumber) {
 function optimize() {
     const maxNumber = parseInt(document.getElementById('maxNumber').value);
     const target = parseInt(document.getElementById('target').value);
-    const [minOps, path, steps] = minOperationsAndPath(target, maxNumber);
+    const options = {
+        mulAvailable: document.getElementById('multiplication').checked,
+        subAvailable: document.getElementById('subtraction').checked,
+        divAvailable: document.getElementById('division').checked,
+        expAvailable: document.getElementById('exponentiation').checked
+    };
+    const [minOps, path, steps] = minOperationsAndPath(target, maxNumber, options);
 
     document.getElementById('path').innerText = `Path to ${target}: ${path}`;
     document.getElementById('result').innerText = `Minimum operations needed to reach ${target} using 1-${maxNumber} is ${minOps}`;

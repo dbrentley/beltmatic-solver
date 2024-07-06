@@ -25,6 +25,16 @@
             <p class="description">The number you are trying to create.</p>
             <input type="number" id="target" name="target">
         </div>
+
+        <label> Operations available: </label>
+        <fieldset>
+            <legend></legend>
+            <label> <input type="checkbox" id="multiplication" checked/> Multiplication </label>
+            <label> <input type="checkbox" id="subtraction"/> Subtraction </label>
+            <label> <input type="checkbox" id="division"/> Division </label>
+            <label> <input type="checkbox" id="exponentiation"/> Exponentiation </label>
+        </fieldset>
+
         <button onclick="optimize()">Solve</button>
         <h2>Results</h2>
         <p id="result"></p>

@@ -100,3 +100,9 @@ button:hover {
     text-align: center;
     margin-top: 5px;
 }
+
+fieldset {
+    display: inline-block;
+    vertical-align: top;
+    border: none;
+}
