@@ -1,5 +1,6 @@
 function minOperationsAndPath(target, maxNumber) {
-    const numbers = Array.from({ length: maxNumber }, (_, i) => i + 1);
+	const unmineableNumbers = [10];
+    const numbers = filtered_range(0, maxNumber, unmineableNumbers);
     const operations = {};
     numbers.forEach(num => {
         operations[num] = [0, `${num}`, [`Start with ${num}`]];
@@ -94,6 +95,14 @@ function optimize() {
     document.getElementById('path').innerText = `Path to ${target}: ${path}`;
     document.getElementById('result').innerText = `Minimum operations needed to reach ${target} using 1-${maxNumber} is ${minOps}`;
     document.getElementById('steps').innerText = steps.join('\n');
+}
+
+function filtered_range(start, end, banned) {
+  let nums = [];
+  for (let i = start; i <= end; i++) {
+    if (banned.includes(i) == false) nums.push(i);
+  }
+  return nums;
 }
 
 // Add event listener to handle Enter key submission
